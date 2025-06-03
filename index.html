@@ -28,7 +28,7 @@
         <div id="suzuki" class="tab-content">
             <div class="mb-6">
                 <label class="block text-gray-700 font-medium mb-2" for="suzukiCost">Dealer Cost ($)</label>
-                <input id="suzukiCost" type="number" value="15000" step="0.01" min="0" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500">
+                <input id="suzukiCost" type="number" value="100" step="0.01" min="0" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500">
                 <label class="inline-flex items-center mt-2">
                     <input id="suzukiOption" type="checkbox" class="form-checkbox h-5 w-5 text-blue-600">
                     <span class="ml-2 text-gray-700">2 for 4 (Additional 15% off)</span>
@@ -38,13 +38,13 @@
                 <tr>
                     <td class="text-gray-700 font-bold">Dealer Cost:</td>
                     <td class="text-gray-700 text-xl font-bold text-right">
-                        <span id="suzukiCostDisplay" class="monospace">$15,000.00</span>
+                        <span id="suzukiCostDisplay" class="monospace">$100.00</span>
                     </td>
                 </tr>
                 <tr>
                     <td class="text-gray-700 font-bold">Sale Price:</td>
-                    <td class="text-green-600 text-xl font-bold text-right">
-                        <span id="suzukiSalePriceDisplay" class="monospace">$13,125.00</span>
+                    <td class="text-green-600 text-2xl font-bold text-right">
+                        <span id="suzukiSalePriceDisplay" class="monospace">$87.50</span>
                     </td>
                 </tr>
             </table>
@@ -53,19 +53,19 @@
         <div id="yamaha" class="tab-content">
             <div class="mb-6">
                 <label class="block text-gray-700 font-medium mb-2" for="yamahaCost">Dealer Cost ($)</label>
-                <input id="yamahaCost" type="number" value="15000" step="0.01" min="0" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500">
+                <input id="yamahaCost" type="number" value="100" step="0.01" min="0" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500">
             </div>
             <table class="w-full mb-4">
                 <tr>
                     <td class="text-gray-700 font-bold">Dealer Cost:</td>
                     <td class="text-gray-700 text-xl font-bold text-right">
-                        <span id="yamahaCostDisplay" class="monospace">$15,000.00</span>
+                        <span id="yamahaCostDisplay" class="monospace">$100.00</span>
                     </td>
                 </tr>
                 <tr>
                     <td class="text-gray-700 font-bold">Sale Price:</td>
-                    <td class="text-green-600 text-xl font-bold text-right">
-                        <span id="yamahaSalePriceDisplay" class="monospace">$13,125.00</span>
+                    <td class="text-green-600 text-2xl font-bold text-right">
+                        <span id="yamahaSalePriceDisplay" class="monospace">$87.50</span>
                     </td>
                 </tr>
             </table>
@@ -82,7 +82,7 @@
         const YAMAHA_DISCOUNT = 12.5;
 
         function formatCurrency(value) {
-            return parseFloat(value).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+            return parseFloat(value || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
         }
 
         function calculateSalePrice(brand, cost, optionChecked) {
