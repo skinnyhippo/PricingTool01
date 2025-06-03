@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discount Pricing Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        input:focus { outline: none; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; }
+        th { background: #f3f4f6; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl">
+        <div class="flex border-b">
+            <button class="tab-button flex-1 py-3 text-center font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-tab="suzuki">Suzuki</button>
+            <button class="tab-button flex-1 py-3 text-center font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-tab="yamaha">Yamaha</button>
+        </div>
+        <div id="suzuki" class="tab-content p-6">
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2" for="suzukiCustomer">Customer Name</label>
+                <input id="suzukiCustomer" type="text" value="" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Enter customer name">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2" for="suzukiModel">Model</label>
+                <input id="suzukiModel" type="text" value="" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Enter model (e.g., GSX-R750)">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2" for="suzukiCost">Dealer Cost ($)</label>
+                <input id="suzukiCost" type="number" value="100" step="0.01" min="0" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Enter dealer cost">
+                <label class="inline-flex items-center mt-2">
+                    <input id="suzukiOption" type="checkbox" class="form-checkbox h-5 w-5 text-blue-600">
+                    <span class="ml-2 text-gray-700">2 for 4 (Additional 15% off)</span>
+                </label>
+            </div>
+            <div class="text-lg font-semibold mb-4">Sale Price: $<span id="suzukiSalePrice">87.50</span></div>
+            <button id="suzukiSave" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Save</button>
+            <div class="mt-4">
+                <h3 class="text-gray-700 font-medium mb-2">Recent Entries</h3>
+                <table id="suzukiHistory">
+                    <thead><tr><th>Customer</th><th>Model</th><th>Dealer Cost</th><th>2 for 4</th><th>Sale</th><th>Action</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="yamaha" class="tab-content p-6">
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2" for="yamahaCustomer">Customer Name</label>
+                <input id="yamahaCustomer" type="text" value="" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Enter customer name">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2" for="yamahaModel">Model</label>
+                <input id="yamahaModel" type="text" value="" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Enter model (e.g., YZF-R1)">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2" for="yamahaCost">Dealer Cost ($)</label>
+                <input id="yamahaCost" type="number" value="100" step="0.01" min="0" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Enter dealer cost">
+            </div>
+            <div class="text-lg font-semibold mb-4">Sale Price: $<span id="yamahaSalePrice">87.50</span></div>
+            <button id="yamahaSave" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Save</button>
+            <div class="mt-4">
+                <h3 class="text-gray-700 font-medium mb-2">Recent Entries</h3>
+                <table id="yamahaHistory">
+                    <thead><tr><th>Customer</th><th>Model</th><th>Dealer Cost</th><th>Sale</th><th>Action</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        const SUZUKI_DISCOUNT = 12.5; // Adjust Suzuki base discount percentage here
+        const SUZUKI_OPTION_DISCOUNT = 15; // Additional discount for 2 for 4 option
+        const YAMAHA_DISCOUNT = 12.5; // Adjust Yamaha discount percentage here
+        const MAX_HISTORY = 5; // Number of entries to store
+
+        function calculateSalePrice(brand, cost, optionChecked) {
+            const dealerCost = parseFloat(cost) || 0;
+            let discountFactor = 1 - (brand === 'suzuki' ? SUZUKI_DISCOUNT : YAMAHA_DISCOUNT) / 100;
+            if (brand === 'suzuki' && optionChecked) {
+                discountFactor *= (1 - SUZUKI_OPTION_DISCOUNT / 100);
+            }
+            return (dealerCost * discountFactor).toFixed(2);
+        }
+
+        function saveEntry(brand, customer, model, cost, salePrice, option2for4) {
+            if (!customer || !model || !cost) return; // Prevent saving if any field is empty
+            const key = `${brand}History`;
+            let history = JSON.parse(localStorage.getItem(key) || '[]');
+            history.unshift({ customer, model, cost, salePrice, option2for4 });
+            if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
+            localStorage.setItem(key, JSON.stringify(history));
+            updateHistoryTable(brand);
+        }
+
+        function removeEntry(brand, index) {
+            const key = `${brand}History`;
+            let history = JSON.parse(localStorage.getItem(key) || '[]');
+            history.splice(index, 1); // Remove entry at index
+            localStorage.setItem(key, JSON.stringify(history));
+            updateHistoryTable(brand);
+        }
+
+        function updateSalePrice(brand) {
+            const costInput = document.getElementById(`${brand}Cost`);
+            const salePriceSpan = document.getElementById(`${brand}SalePrice`);
+            const optionChecked = brand === 'suzuki' ? document.getElementById('suzukiOption').checked : false;
+            const salePrice = calculateSalePrice(brand, costInput.value, optionChecked);
+            salePriceSpan.textContent = salePrice;
+        }
+
+        function updateHistoryTable(brand) {
+            const tableBody = document.getElementById(`${brand}History`).querySelector('tbody');
+            const history = JSON.parse(localStorage.getItem(`${brand}History`) || '[]');
+            tableBody.innerHTML = '';
+            history.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.customer}</td>
+                    <td>${entry.model}</td>
+                    <td>$${parseFloat(entry.cost).toFixed(2)}</td>
+                    ${brand === 'suzuki' ? `<td>${entry.option2for4 ? 'Yes' : 'No'}</td>` : ''}
+                    <td>$${entry.salePrice}</td>
+                    <td>
+                        <button class="load-btn text-blue-500 hover:underline mr-2" data-index="${index}">Load</button>
+                        <button class="remove-btn text-red-500 hover:underline" data-index="${index}">Remove</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            document.querySelectorAll(`#${brand}History .load-btn`).forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const index = btn.getAttribute('data-index');
+                    const entry = history[index];
+                    document.getElementById(`${brand}Customer`).value = entry.customer;
+                    document.getElementById(`${brand}Model`).value = entry.model;
+                    document.getElementById(`${brand}Cost`).value = entry.cost;
+                    if (brand === 'suzuki') {
+                        document.getElementById('suzukiOption').checked = entry.option2for4 || false;
+                    }
+                    updateSalePrice(brand);
+                });
+            });
+            document.querySelectorAll(`#${brand}History .remove-btn`).forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const index = btn.getAttribute('data-index');
+                    removeEntry(brand, index);
+                });
+            });
+        }
+
+        // Tab switching
+        const buttons = document.querySelectorAll('.tab-button');
+        const tabs = document.querySelectorAll('.tab-content');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tab = button.getAttribute('data-tab');
+                tabs.forEach(t => t.classList.remove('active'));
+                buttons.forEach(b => {
+                    b.classList.remove('bg-blue-500', 'text-white');
+                    b.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                document.getElementById(tab).classList.add('active');
+                button.classList.remove('bg-gray-200', 'text-gray-700');
+                button.classList.add('bg-blue-500', 'text-white');
+            });
+        });
+
+        // Initialize first tab as active
+        document.getElementById('suzuki').classList.add('active');
+        buttons[0].classList.remove('bg-gray-200', 'text-gray-700');
+        buttons[0].classList.add('bg-blue-500', 'text-white');
+
+        // Add input, save, and option listeners
+        ['suzuki', 'yamaha'].forEach(brand => {
+            document.getElementById(`${brand}Cost`).addEventListener('input', () => updateSalePrice(brand));
+            document.getElementById(`${brand}Save`).addEventListener('click', () => {
+                const customer = document.getElementById(`${brand}Customer`).value;
+                const model = document.getElementById(`${brand}Model`).value;
+                const cost = document.getElementById(`${brand}Cost`).value;
+                const salePrice = document.getElementById(`${brand}SalePrice`).textContent;
+                const option2for4 = brand === 'suzuki' ? document.getElementById('suzukiOption').checked : false;
+                saveEntry(brand, customer, model, cost, salePrice, option2for4);
+            });
+            updateHistoryTable(brand); // Initial history load
+        });
+
+        // Suzuki-specific option listener
+        document.getElementById('suzukiOption').addEventListener('change', () => updateSalePrice('suzuki'));
+
+        // Initial calculations
+        updateSalePrice('suzuki');
+        updateSalePrice('yamaha');
+    </script>
+</body>
+</html>
