@@ -11,11 +11,6 @@
         input:focus { outline: none; }
         .tab-button { transition: background-color 0.3s ease; }
         .monospace { font-family: monospace; }
-        @media print {
-            body * { visibility: hidden; }
-            .tab-content.active, .tab-content.active * { visibility: visible; }
-            .tab-content.active { position: absolute; left: 0; top: 0; width: 100%; }
-        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
@@ -48,7 +43,6 @@
                     </td>
                 </tr>
             </table>
-            <button id="suzukiPrint" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Print</button>
         </div>
         <div id="yamaha" class="tab-content">
             <div class="mb-6">
@@ -69,10 +63,10 @@
                     </td>
                 </tr>
             </table>
-            <button id="yamahaPrint" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Print</button>
         </div>
         <div class="text-center text-gray-500 text-sm mt-4">
-            <p>For internal use only</p>
+            <p>For internal use only.</p>
+            <p>Take DEALER COST from current price list. Rigging, installation and Prop not included, does not include applicable taxes or fees.</p>
             <p>Version 1.0</p>
         </div>
     </div>
@@ -131,9 +125,6 @@
         // Add input and option listeners
         ['suzuki', 'yamaha'].forEach(brand => {
             document.getElementById(`${brand}Cost`).addEventListener('input', () => updateSalePrice(brand));
-            document.getElementById(`${brand}Print`).addEventListener('click', () => {
-                window.print();
-            });
         });
 
         document.getElementById('suzukiOption').addEventListener('change', () => updateSalePrice('suzuki'));
